@@ -1,35 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 20 13:32:58 2026
+Shared configuration for Zybo (TX/RX, DSP, UDP) and PC GUI.
 
-@author: Net
+- Override locally via cfg_local.py (same symbols) without touching this file.
+- Used by both main_zybo.py and main_pc.py/ui.pc_gui.py.
 """
-#HELLO OLD TEXT
-# Shared configuration (both sides)
 
-FS = 48000.0
-C_SOUND = 343.0
+# Sampling parameters
+FS = 48000.0                 # Audio sampling rate [Hz]
+C_SOUND = 343.0              # Default speed of sound [m/s] (20°C); GUI can adjust
 
-FIFOSIZE = 4096
-FPS = 10.0
-LOOP_DT = 1.0 / FPS
+# Buffering / loop timing
+FIFOSIZE = 4096              # Audio FIFO size (samples per channel)
+FPS = 10.0                   # Target UI/streaming frame rate
+LOOP_DT = 1.0 / FPS          # Loop period used on Zybo side
 
-# Network
-PC_IP = "192.168.1.1"
-ZYBO_IP = "192.168.1.103"
+# Network endpoints (Zybo -> PC)
+PC_IP = "192.168.1.1"        # PC address for receiving CORR/MEAS
+ZYBO_IP = "192.168.1.103"    # Zybo address for outbound CMD target
 
-CORR_PORT = 5005
-MEAS_PORT = 5006
-CMD_PORT = 6006
-CMD_BIND_IP = "0.0.0.0"
+CORR_PORT = 5005             # UDP port for correlation windows (Zybo -> PC)
+MEAS_PORT = 5006             # UDP port for measurement packets (Zybo -> PC)
+CMD_PORT = 6006              # UDP port for commands (PC -> Zybo)
+CMD_BIND_IP = "0.0.0.0"      # Bind address on Zybo for commands
 
-WINDOW_LEN = 512
-UDP_MAX_PAYLOAD = 1200
+WINDOW_LEN = 512             # Correlation window length to stream
+UDP_MAX_PAYLOAD = 1200       # Max UDP payload for correlation chunks
 
-MIC_SPACING_M = 0.50
-# Codec/processing delay compensation (in samples), applied on Zybo before
-# sending TOA lags. Keep zero to disable.
+# Geometry / physical setup
+MIC_SPACING_M = 0.50         # Distance between microphones [m]
+# Codec/processing delay compensation (samples), applied on Zybo before sending Tx→Mic lags
+# Keep zero to disable; can be overridden via GUI slider or CMD.
 DELAY_COMP_SAMPLES = 0
 
-# Swap microphones (treat physical right as logical left and vice versa)
+# If True, swap L/R microphones in software (useful if wired backwards in the lab)
 SWAP_MICS = True

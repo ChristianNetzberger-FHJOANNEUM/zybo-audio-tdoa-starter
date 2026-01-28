@@ -1,0 +1,36 @@
+rtc-audio-project
+├── .vscode
+│   └── settings.json
+├── cfg.py
+├── cfg_local.py
+├── config.txt
+├── dsp
+│   ├── __init__.py
+│   ├── corr.py
+│   ├── gen.py
+│   └── pack.py
+├── git-usage.txt
+├── hw
+│   ├── audio_peripherals.py
+│   ├── regBlockC.py
+│   ├── regBlockEMU.py
+│   └── regs.py
+├── main_pc.py
+├── main_zybo.py
+├── make_student_repo.py
+├── net
+│   ├── __init__.py
+│   ├── cmd.py
+│   ├── meas.py
+│   ├── proto.py
+│   └── udp_corr.py
+├── PC
+├── README.md
+├── register_spec.py
+├── tree.txt
+├── tree_print.py
+├── ui
+│   ├── __init__.py
+│   ├── pc_gui.py
+│   └── plot_utils.py
+└── Zybo

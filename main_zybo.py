@@ -141,18 +141,17 @@ def init_hw():
     print("FPGA Version = ",hw_version.get())
 
     audio = Audio(ip["core"], shadow_regs)
-    audio.audio_select(1)
-    audio.fxgen_wavsel(4)
-    audio.fifo_enable(0)
-    audio.fifo_enable(1)
-    audio.line_activate()
-    audio.audio_mute(1, 0)
-    audio.audio_in_scale(1)
-    audio.audio_loop(0)
-
-    wrsize = audio.get_fifo_wrsize()
-    print("audio fifo wr size:", wrsize)
-
+    #STUDENT_TODO_START:
+# HINT
+    # initialize the audio interface here
+    # 
+    # 
+    # 
+    # 
+    # 
+    
+   #STUDENT_TODO_END:  
+ 
     return audio, sliders
 
 
@@ -205,10 +204,13 @@ def apply_waveform_state(audio, gen, state):
         )
         # Specific behavior for SINE waveform: only write m samples
         mN = int(state["m"])
-        start = time.perf_counter()
-        audio.fifo_send(txbuf[:mN])
-        stop = time.perf_counter()
-        print(f"time to load tx buffer: {(stop-start)*1e6:.1f} us")
+        try:
+            start = time.perf_counter()
+            audio.fifo_send(txbuf[:mN])
+            stop = time.perf_counter()
+            print(f"time to load tx buffer: {(stop-start)*1e6:.1f} us")
+        except Exception as e:
+            print(f"Error sending audio: {e}")
 
         #Example to create zero data transmit buffer, write all FIFOSIZE samples
         #In the ZERO waveform branch, it sends silence to the DACs:

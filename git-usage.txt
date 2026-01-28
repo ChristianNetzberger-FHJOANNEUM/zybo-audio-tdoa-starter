@@ -1,0 +1,249 @@
+
+Step 1: Create repo on GitHub
+
+On your GitHub account:
+
+New repo name suggestion: zybo-audio-tdoa-solution
+
+Choose Private (recommended)
+
+Add README ✅ (optional)
+
+Step 2: Clone to your PC
+
+Use either:
+
+Cursor (Open folder → Clone repository)
+
+OR terminal:
+
+git clone https://github.com/ChristianNetzberger-FHJOANNEUM/zybo-audio-tdoa-solution.git
+cd zybo-audio-tdoa-solution
+
+Step 3: Put your code into that folder
+
+Copy your current project directory into the cloned folder.
+
+Then:
+
+git add .
+git commit -m "Initial working solution"
+git push
+
+Important: your current code lives on Zybo SD card via sshfs
+
+That’s OK — but for Git I strongly recommend:
+
+✅ keep the repo physically on the PC local disk
+and treat Zybo as a “deployment target”.
+
+Because:
+
+git on sshfs / SD is slower
+
+SD wear
+
+easier GitHub auth on Windows
+
+easier branching + refactors
+
+You can still edit Zybo files through sshfs if you want — but the “master repo” should be on PC.
+
+If you want: one-click sync to Zybo
+
+Later we can add a simple deploy script like:
+
+copy only main_zybo.py, dsp/, net/, hw/, cfg.py
+
+via scp or rsync
+
+So your workflow becomes:
+
+edit on PC
+
+deploy_to_zybo.bat
+
+run on Zybo via PuTTY
+
+Summary
+
+✅ Yes, both Spyder and Cursor can use the same Git repo perfectly.
+Cursor has stronger Git UI, Spyder is better for interactive Python work.
+Using both is actually a very good combo.
+
+If you want, I can generate:
+
+a good .gitignore for your project (numpy dumps, cache, logs, etc.)
+
+a minimal README.md structure
+
+a deploy_to_zybo script that copies only what the Zybo Needs
+
+here’s a useful, teaching/project-friendly .gitignore for your setup (Python + NumPy + matplotlib + Spyder + Cursor/VSCode + Windows + Linux Zybo).
+
+Create a file named .gitignore in the repo root:
+
+# =========================
+# Python bytecode / caches
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Packaging / build
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Test / coverage
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# =========================
+# Jupyter / IPython
+# =========================
+.ipynb_checkpoints/
+.profile_default/
+.ipython/
+
+# =========================
+# Data / output files
+# (don't commit generated data)
+# =========================
+*.npy
+*.npz
+*.mat
+*.csv
+*.tsv
+*.jsonl
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Audio / signal captures
+*.wav
+*.flac
+*.mp3
+*.aac
+*.ogg
+*.raw
+*.pcm
+
+# Binary dumps / FPGA captures
+*.bin
+*.dat
+*.mem
+*.hex
+
+# Logs
+*.log
+logs/
+*.out
+
+# Figures / exports (optional)
+# Uncomment if you don't want plots/images in git
+# *.png
+# *.jpg
+# *.jpeg
+# *.svg
+# *.pdf
+
+# =========================
+# Editor / IDE files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Spyder / PyCharm / VSCode config
+.spyderproject
+.spyproject
+.ropeproject
+
+# Cursor editor
+.cursor/
+
+# =========================
+# OS specific
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Local config secrets
+# (keep machine/IP specific stuff out of git)
+# =========================
+cfg_local.py
+config_local.py
+secrets.py
+
+# =========================
+# Zybo / Linux artefacts
+# =========================
+*.so
+*.o
+*.a
+
+# =========================
+# Optional: generated starter export folder
+# =========================
+dist/starter/
+
+
+✅ Nächster Schritt: Ubuntu starten (genau so!)
+
+In Cursor Terminal:
+
+wsl -d "Ubuntu 22.04 LTS"
+
+
+Dann kommt die Linux-Ersteinrichtung (Username/Password).
+
+✅ Danach in Ubuntu (WSL): rsync + ssh installieren
+sudo apt update
+sudo apt install -y rsync openssh-client
+
+✅ Test: SSH zum Zybo
+ssh debian@192.168.1.103
+
+
+Wenn gefragt wird → yes und Passwort.
+
+✅ Check, ob Ubuntu korrekt da ist
+
+Zurück in PowerShell kannst du prüfen:
+
+wsl -l -v
+
+
+Du solltest sehen:
+
+Ubuntu 22.04 LTS
+
+Version 2
+
+Optional (praktisch): Default WSL Distro setzen
+
+Damit wsl automatisch Ubuntu 22.04 startet:
+
+wsl --set-default "Ubuntu 22.04 LTS"
+

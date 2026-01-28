@@ -48,14 +48,11 @@ class Sliders():
         self.ip_mmap         = ip_mmap
 
     def get(self):
-        if self.regAddr < 0:
-            return 0
+        value = getreg(self.ip_mmap, reg.sliders)
+        if self.sliderNumber < 0:
+            return  value     
         else:
-            value = getreg(self.ip_mmap, reg.sliders)
-            if self.sliderNumber < 0:
-                return  value     
-            else:
-                return  value   & (1<<self.sliderNumber)      
+            return  value   & (1<<self.sliderNumber)      
 
     def get_config(self):
         return self.ip_mmap,self.regSlice
@@ -115,87 +112,60 @@ class Leds():
         self.shadow_regs    = shadow_regs
         
     def set(self,value): # led can be on or off
-        setreg(self.ip_mmap, self.shadow_regs, reg.leds,1)
+        setreg(self.ip_mmap, self.shadow_regs, reg.leds,value)
 
     def get_config(self):
         return self.ip_mmap,self.regSlice
 
+"""Reg definitions for the audio peripherals
+fxgen_level           = (0x02,0,15)   # function generator signal level
+fxgen_offset          = (0x02,16,31)  # function generator signal offset
+fxgen_fcw             = (0x03,0,31)   # function generator frequency control word
+fxgen_wavsel          = (0x04,0,3)    # function generator waveform selection
+audio_select          = (0x04,4,4)    # select audio for audio dsp input
+line_select           = (0x04,5,5)    # select line in
+mic_select            = (0x04,6,6)    # select microphone in
+test_in_left          = (0x04,8,8)    # force test signal on left audio input
+test_in_right         = (0x04,9,9)    # force test signal on right audio input
+test_out_left         = (0x04,10,10)  # force test signal on left audio output
+test_out_right        = (0x04,11,11)  # force test signal on right audio output
+audio_loop_en         = (0x04,7,7)    # enable audio loop
+audio_in_scale        = (0x04,12,15)  # barrel shifter to amplify audio input
+audio_mute_left       = (0x04,16,16)  # mute left audio out
+audio_mute_right      = (0x04,17,17)  # mute right audio out
+
+fifo2_rdata           = (0x1E,0,31)   # audio fifo read data
+fifo2_rd_stb          = (0x1E,0,0)    # audio fifo read strobe
+fifo2_wdata           = (0x1E,0,31)   # audio fifo write data
+fifo2_wr_stb          = (0x1E,0,0)    # audio fifo write strobe
+fifo2_en              = (0x1F,0,0)    # audio fifo enable
+fifo2_reset           = (0x1F,1,1)    # audio fifo_reset
+fifo2_rxtrig          = (0x1F,2,2)    # audio fifo receive trigger
+fifo2_rx_stream       = (0x20,3,3)    # audio fifo read continuous stream
+fifo2_tx_size         = (0x20,0,15)   # audio fifo  size in tx path
+fifo2_tx_waddr        = (0x20,16,31)  # audio fifo write address in tx path
+fifo2_rx_size         = (0x21,0,15)   # audio fifo size in rx path
+fifo2_rx_waddr        = (0x21,16,31)  # audio fifo write address in tx path
+"""
 class Audio():
     def __init__(self,ip_mmap,shadow_regs):
         self.ip_mmap         = ip_mmap
         self.shadow_regs    = shadow_regs
         self._fifo_u32 = self.ip_mmap.bind_u32(reg.fifo2_rdata[0])  # fifo_reg[0] is your word address
-    
+    #example methods
     def mic_activate(self):
         setreg(self.ip_mmap, self.shadow_regs, reg.mic_select,1)
         return            
     def line_activate(self):
         setreg(self.ip_mmap, self.shadow_regs,reg.line_select,1)
-        return            
-    def audio_select(self,value):
-        setreg(self.ip_mmap, self.shadow_regs,reg.audio_select,value)
-        return            
-    def audio_mute(self,left,right):
-        setreg(self.ip_mmap, self.shadow_regs,reg.audio_mute_left,left)
-        setreg(self.ip_mmap, self.shadow_regs,reg.audio_mute_right,right)
-        return            
-    def audio_loop(self,value):
-        setreg(self.ip_mmap, self.shadow_regs,reg.audio_loop_en,value)
-        return            
-    def audio_in_scale(self,value):
-        setreg(self.ip_mmap, self.shadow_regs,reg.audio_in_scale,value)
-        return            
-    def test_out(self,left,right):
-        setreg(self.ip_mmap, self.shadow_regs,reg.test_out_left,left)
-        setreg(self.ip_mmap, self.shadow_regs,reg.test_out_right,right)
-        return            
-    def fxgen_frequency(self,freq):
-        setreg(self.ip_mmap, self.shadow_regs,reg.fxgen_fcw,freq*42000)
-        return  
-    def fxgen_wavsel(self,value):
-        setreg(self.ip_mmap, self.shadow_regs,reg.fxgen_wavsel,value)  
-        return  
-        return
-    def fxgen_level(self,value):
-        setreg(self.ip_mmap, self.shadow_regs,reg.fxgen_level,value) 
-        return
-    def fifo_send(self,txdata):
-        print(f"'FIFO Write: before write: waddr={self.get_fifo_waddr()}, wrsize={self.get_fifo_wrsize()}, rdsize={self.get_fifo_rdsize()}")
-        self.fifo_enable(1)
-        # for i in range(txdata.size):
-        #     self._setreg(self.regs, self.shadow_regs,fifo_reg,txdata[i])
-        tx = np.asarray(txdata, dtype=np.uint32)  # avoids numpy int32 negatives etc.
-        fifo = self._fifo_u32                     # local var for speed
-        for v in tx.tolist():                     # Python ints iterate fast
-            fifo.value = v
-        self.fifo_enable(1)
-        print(f"'FIFO Write: after write: waddr={self.get_fifo_waddr()}, wrsize={self.get_fifo_wrsize()}, rdsize={self.get_fifo_rdsize()}")
-        print("sent",txdata.size,"Audio Samples")
         return    
-    def fifo_receive(self,nsamples):
-        fifo = self._fifo_u32
-        data = [0] * nsamples
-        for i in range(nsamples):
-            data[i] = fifo.value
+    #STUDENT_TODO_START:
+# HINT
+    # add remaining methods for the audio interface here 
+    # 
+    # 
+    # 
+    #    
     
-        rx = np.array(data, dtype=np.uint32)
-        return rx
-
-    def fifo_enable(self,value):       
-        setreg(self.ip_mmap, self.shadow_regs,reg.fifo2_en,value) 
-        return
-    def fifo_reset(self,value):       
-        setreg(self.ip_mmap, self.shadow_regs,reg.fifo2_reset,value) 
-        return
-    def fifo_rxtrigger(self):       
-        setreg(self.ip_mmap, self.shadow_regs,reg.fifo2_rxtrig,1) 
-        return
-    def get_fifo_wrsize(self):
-        value  = getreg(self.ip_mmap, reg.fifo2_wr_size)
-        return(value)
-    def get_fifo_rdsize(self):
-        value  = getreg(self.ip_mmap, reg.fifo2_rd_size)
-        return(value)
-    def get_fifo_waddr(self):
-        value  = getreg(self.ip_mmap, reg.fifo2_waddr)
-        return(value)
+    #STUDENT_TODO_END:
+ 

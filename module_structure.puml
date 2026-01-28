@@ -1,0 +1,59 @@
+@startuml
+title rtc-audio-project – module overview
+
+skinparam rectangle {
+  BackgroundColor #eef5ff
+  BorderColor #6a8fbf
+}
+skinparam package {
+  BackgroundColor #f8f8f8
+  BorderColor #999
+}
+
+rectangle "cfg.py\ncfg_local.py" as cfg
+rectangle "main_zybo.py" as main_zybo
+rectangle "main_pc.py" as main_pc
+
+package "hw" {
+  rectangle "audio_peripherals.py" as hw_audio
+  rectangle "regs.py" as hw_regs
+  rectangle "regBlockC.py" as hw_regblock
+}
+
+package "dsp" {
+  rectangle "corr.py" as dsp_corr
+  rectangle "gen.py" as dsp_gen
+  rectangle "pack.py" as dsp_pack
+}
+
+package "net" {
+  rectangle "udp_corr.py" as net_udp
+  rectangle "meas.py" as net_meas
+  rectangle "cmd.py" as net_cmd
+  rectangle "proto.py" as net_proto
+}
+
+package "ui" {
+  rectangle "pc_gui.py" as ui_pc
+  rectangle "plot_utils.py" as ui_plot
+}
+
+main_zybo --> cfg
+main_zybo --> hw_audio
+main_zybo --> hw_regblock
+main_zybo --> dsp_corr
+main_zybo --> dsp_gen
+main_zybo --> dsp_pack
+main_zybo --> net_udp
+main_zybo --> net_meas
+main_zybo --> ui_plot
+
+main_pc --> cfg
+main_pc --> ui_pc
+ui_pc --> net_cmd
+ui_pc --> net_udp
+ui_pc --> net_proto
+
+hw_audio --> hw_regs
+
+@enduml
